@@ -13,7 +13,7 @@ layer {
     mean_value: 123
   }
   image_data_param {
-    source: "/data/database/conf/celebA.txt"
+    source: "C:/Users/NFS/PycharmProjects/dataset/img_align_celeba/cropped/CelebA.txt"
     batch_size: 64
 #    new_height: 256
 #    new_width: 256

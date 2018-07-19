@@ -13,12 +13,13 @@ max_iter = int(1e6) # maximum number of iterations
 display_every = 20 # show losses every so many iterations
 snapshot_every = 1000 # snapshot every so many iterations
 snapshot_folder = 'snapshots_test' # where to save the snapshots (and load from)
-gpu_id = 0
+gpu_id = 2
 feat_shape = (nz,)
 im_size = (3,image_size,image_size)
 batch_size = 64
 snapshot_at_iter = -1
 snapshot_at_iter_file = 'snapshot_at_iter.txt'
+start_snapshot = 5000
 
 sub_nets = ('generator', 'discriminator', 'data')
 
@@ -44,7 +45,7 @@ data_reader = caffe.AdamSolver('solver_data.prototxt')
 #load from snapshot
 if start_snapshot:
   curr_snapshot_folder = snapshot_folder +'/' + str(start_snapshot)
-  print >> sys.stderr, '\n === Starting from snapshot ' + curr_snapshot_folder + ' ===\n'
+  print('\n === Starting from snapshot ' + curr_snapshot_folder + ' ===\n', file=sys.stderr)
   generator_caffemodel = curr_snapshot_folder +'/' + 'generator.caffemodel'
   if os.path.isfile(generator_caffemodel):
     generator.net.copy_from(generator_caffemodel)
@@ -114,10 +115,10 @@ for it in range(start_snapshot,max_iter):
    
   #display
   if it % display_every == 0:
-    print >> sys.stderr, "[%s] Iteration %d: %f seconds" % (time.strftime("%c"), it, time.time()-start)
-    print >> sys.stderr, "  discr real loss: %e * %e = %f" % (discr_real_loss, discr_loss_weight, discr_real_loss*discr_loss_weight)
-    print >> sys.stderr, "  discr fake loss: %e * %e = %f" % (discr_fake_loss, discr_loss_weight, discr_fake_loss*discr_loss_weight)
-    print >> sys.stderr, "  discr fake loss for generator: %e * %e = %f" % (discr_fake_for_generator_loss, discr_loss_weight, discr_fake_for_generator_loss*discr_loss_weight)
+    print("[%s] Iteration %d: %f seconds" % (time.strftime("%c"), it, time.time()-start), file=sys.stderr)
+    print("  discr real loss: %e * %e = %f" % (discr_real_loss, discr_loss_weight, discr_real_loss*discr_loss_weight), file=sys.stderr)
+    print("  discr fake loss: %e * %e = %f" % (discr_fake_loss, discr_loss_weight, discr_fake_loss*discr_loss_weight), file=sys.stderr)
+    print("  discr fake loss for generator: %e * %e = %f" % (discr_fake_for_generator_loss, discr_loss_weight, discr_fake_for_generator_loss*discr_loss_weight), file=sys.stderr)
     start = time.time()
     if os.path.isfile(snapshot_at_iter_file):
       with open (snapshot_at_iter_file, "r") as myfile:
@@ -126,7 +127,7 @@ for it in range(start_snapshot,max_iter):
   #snapshot
   if it % snapshot_every == 0 or it == snapshot_at_iter:
     curr_snapshot_folder = snapshot_folder +'/' + str(it)
-    print >> sys.stderr, '\n === Saving snapshot to ' + curr_snapshot_folder + ' ===\n'
+    print('\n === Saving snapshot to ' + curr_snapshot_folder + ' ===\n', file=sys.stderr)
     if not os.path.exists(curr_snapshot_folder):
       os.makedirs(curr_snapshot_folder)
     generator_caffemodel = curr_snapshot_folder + '/' + 'generator.caffemodel'
@@ -140,13 +141,13 @@ for it in range(start_snapshot,max_iter):
   if discr_loss_ratio < 1e-1 and train_discr:    
     train_discr = False
     train_gen = True
-    print >> sys.stderr, "<<< real_loss=%e, fake_loss=%e, fake_loss_for_generator=%e, train_discr=%d, train_gen=%d >>>" % (discr_real_loss, discr_fake_loss, discr_fake_for_generator_loss, train_discr, train_gen)
+    print("<<< real_loss=%e, fake_loss=%e, fake_loss_for_generator=%e, train_discr=%d, train_gen=%d >>>" % (discr_real_loss, discr_fake_loss, discr_fake_for_generator_loss, train_discr, train_gen), file=sys.stderr)
   if discr_loss_ratio > 5e-1 and not train_discr:    
     train_discr = True
     train_gen = True
-    print >> sys.stderr, " <<< real_loss=%e, fake_loss=%e, fake_loss_for_generator=%e, train_discr=%d, train_gen=%d >>>" % (discr_real_loss, discr_fake_loss, discr_fake_for_generator_loss, train_discr, train_gen)
+    print(" <<< real_loss=%e, fake_loss=%e, fake_loss_for_generator=%e, train_discr=%d, train_gen=%d >>>" % (discr_real_loss, discr_fake_loss, discr_fake_for_generator_loss, train_discr, train_gen), file=sys.stderr)
   if discr_loss_ratio > 1e1 and train_gen:
     train_gen = False
     train_discr = True
-    print >> sys.stderr, "<<< real_loss=%e, fake_loss=%e, fake_loss_for_generator=%e, train_discr=%d, train_gen=%d >>>" % (discr_real_loss, discr_fake_loss, discr_fake_for_generator_loss, train_discr, train_gen)
+    print("<<< real_loss=%e, fake_loss=%e, fake_loss_for_generator=%e, train_discr=%d, train_gen=%d >>>" % (discr_real_loss, discr_fake_loss, discr_fake_for_generator_loss, train_discr, train_gen), file=sys.stderr)
   
